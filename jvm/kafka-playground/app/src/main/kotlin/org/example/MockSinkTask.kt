@@ -66,12 +66,17 @@ class MockSinkTask {
         }
     }
 
+    // NOTE: 원본 메시지를 원하는 형태로 변환한다. Debezium, KafakEvent decorator 메시지 형태에 의존한다.
     private fun transform(record: SinkRecord): SinkRecord {
         val valueStruct = record.value() as Struct
         val afterStruct = valueStruct.getStruct("after")
         val metadataStruct = afterStruct.getString("metadata")
+
+        // NOTE: metadata 존재하면 metadata 내용을 기반으로 메시지에 변형을 가한다.
         if (metadataStruct != null) {
             val metadata = objectMapper.readTree(metadataStruct)
+
+            // NOTE: 1. EventType prefix 설정 (InvoiceConfirmEvent -> PaymentInvoiceConfirmEvent)
             val prefix = metadata["prefix"]?.asText()
             if (!prefix.isNullOrEmpty()) {
                 val type = afterStruct.getString("type")
