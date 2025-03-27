@@ -37,7 +37,8 @@ const consumer = kafka.consumer({
 const run = async () => {
   // Consuming
   await consumer.connect()
-  await consumer.subscribe({ topics: ['test-topic',], fromBeginning: true })
+  // await consumer.subscribe({ topics: ['test-topic',], fromBeginning: true })
+  consumer.on('consumer.connect', (e) => console.log(`consumer.connect`));
   await consumer.run({
     // autoCommit?: boolean
     // autoCommitInterval?: number | null
